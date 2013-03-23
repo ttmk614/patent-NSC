@@ -3,9 +3,10 @@ require 'nokogiri'
 require 'date' 
 
 def issued_year( patent_id )
-	2009
+	2008
 	#lines = File.read( "issueyear.txt" )
 end
+######################################################################################
 ######################################################################################
 #html: the section of HTML object which contains requested information
 def issue_date( html )
@@ -37,23 +38,69 @@ end
 def description( html )
     return html.xpath('//text()')
 end
-# require_relative 'lib/connect_mysql'
+######################################################################################
+class RelatedPatent
+    attr_accessor :relatedTable
+    def initialize(xml)
+        @relatedTable = Array.new
+        temp1 = Nokogiri::HTML(xml)
+        count = 0
+        temp1.xpath("//tr").each do |each|
+            # each = Nokogiri::HTML(each.to_s)    #important!
+            @relatedTable[count] = Hash.new
+            temp2 = each.xpath("td")    #don't use "//td"! "//" means to search full text?
+            @relatedTable[count]['relt_appl_id'] = temp2[1].text
+            if temp2[2].text != '' then
+                dateTemp = Date._parse(temp2[2].text)
+                @relatedTable[count]['relt_filing_date'] = dateTemp[:year].to_s + "-" + dateTemp[:mon].to_s 
+            end
+            @relatedTable[count]['relt_patent_id'] = temp2[3].text
+            if temp2[4].text != '' then
+                dateTemp = Date._parse(temp2[4].text)
+                @relatedTable[count]['relt_issue_date'] = dateTemp[:year].to_s + "-" + dateTemp[:mon].to_s 
+            end
+            count += 1
+        end
 
-# connect = Connect_mysql.new('chuya', '0514')
-# origin_db = connect.db('new_patent')
-# new_db = connect.db('patent') 
+    end
+end
+# $test = '<tr>
+# <td align="center"> </td>
+# <td align="center">11931910</td>
+# <td align="center">Aug., 2011</td>
+# <td align="center">Re. 42620</td>
+# <td align="center"></td>
+# <td></td>
+# </tr>
+# <tr>
+# <td align="center"> </td>
+# <td align="center">11239628</td>
+# <td align="center">Sep., 2005</td>
+# <td align="center"></td>
+# <td align="center"></td>
+# <td></td>
+# </tr>
+# <tr>
+# <td align="center"> Reissue of:</td>
+# <td align="center">09439516</td>
+# <td align="center">Nov., 1999</td>
+# <td align="center">6628729</td>
+# <td align="center">Sep., 2003</td>
+# <td></td>
+# </tr>'
+# a = RelatedPatent.new($test)
+# puts a.relatedTable
 
 class Claim
-	attr_accessor :claimNum, :deptClaimNum, :indeptClaimNum, :claimsFull
-	def initialize(xml)
-    	@claimNum = xml.scan(/<br><br>/).length
-    	@deptClaimNum = xml.scan(/claim/).length
-    	@indeptClaimNum = @claimNum - @deptClaimNum
+    attr_accessor :claimNum, :deptClaimNum, :indeptClaimNum, :claimsFull
+    def initialize(xml)
+        @claimNum = xml.scan(/<br><br>/).length
+        @deptClaimNum = xml.scan(/claim/).length
+        @indeptClaimNum = @claimNum - @deptClaimNum
         temp = xml.gsub(/^<br><br>/, "#")   #for the first '#'
-    	@claimsFull = temp[2..temp.length-1]
-  	end
+        @claimsFull = temp[2..temp.length-1]
+    end
 end
-
 # $test = "<br><br> 1.  A graphic interface device usable in a digital TV, comprising: a receiving side for receiving user graphic environment data corresponding to various forms of user graphic
 # environments .[.displayable on a screen.]., the user graphic environment data including icon data corresponding to various icons;  and a graphic interfacing side for .[.parsing and decoding.].  .Iadd.processing .Iaddend.the user graphic environment data
 # received at the receiving side, and allowing an end user to design a user-preferred user graphic environment including at least one user-defined icon .[.using the user graphic environment data.]., wherein the graphic interfacing side displays an
@@ -114,62 +161,6 @@ end
 # puts a.indeptClaimNum
 
 
-
-# $test = '<td VALIGN=TOP ALIGN="RIGHT" WIDTH="80%">B63C 11/04&amp;nbsp(20130101)</td>'
-# a = CPC.new($test)
-# puts a.cpcLine
-# puts a.cpcTable
-
-class RelatedPatent
-    attr_accessor :relatedTable
-    def initialize(xml)
-        @relatedTable = Array.new
-        temp1 = Nokogiri::HTML(xml)
-        count = 0
-        temp1.xpath("//tr").each do |each|
-            @relatedTable[count] = Hash.new
-            temp2 = each.xpath("td")    
-            @relatedTable[count]['relt_appl_id'] = temp2[1].text
-            if temp2[2].text != '' then
-                dateTemp = Date._parse(temp2[2].text)
-                @relatedTable[count]['relt_filing_date'] = dateTemp[:year].to_s + "-" + dateTemp[:mon].to_s 
-            end
-            @relatedTable[count]['relt_patent_id'] = temp2[3].text
-            if temp2[4].text != '' then
-                dateTemp = Date._parse(temp2[4].text)
-                @relatedTable[count]['relt_issue_date'] = dateTemp[:year].to_s + "-" + dateTemp[:mon].to_s 
-            end
-            count += 1
-        end
-
-    end
-end
-# $test = '<tr>
-# <td align="center"> </td>
-# <td align="center">11931910</td>
-# <td align="center">Aug., 2011</td>
-# <td align="center">Re. 42620</td>
-# <td align="center"></td>
-# <td></td>
-# </tr>
-# <tr>
-# <td align="center"> </td>
-# <td align="center">11239628</td>
-# <td align="center">Sep., 2005</td>
-# <td align="center"></td>
-# <td align="center"></td>
-# <td></td>
-# </tr>
-# <tr>
-# <td align="center"> Reissue of:</td>
-# <td align="center">09439516</td>
-# <td align="center">Nov., 1999</td>
-# <td align="center">6628729</td>
-# <td align="center">Sep., 2003</td>
-# <td></td>
-# </tr>'
-# a = RelatedPatent.new($test)
-# puts a.relatedTable
 
 ############################################################################################3
 

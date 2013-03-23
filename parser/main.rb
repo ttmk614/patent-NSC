@@ -85,7 +85,9 @@ if ARGV.count > 0
 		ipc = IPC.new(html[i].xpath("//tr[2]/td[2]")[0].to_s)
 		patent_attrs << ipc.ipcLine		
 		# B	CPC_line ########
-
+		if (html[i].xpath("//text()")[0].to_s.strip <=> "Current CPC Class")==0
+			cpc = CPC.new(html[i].xpath("//tr[2]/td[2]")[0].to_s)
+		end
 		# A	Field_of_Search_line
 		patent_attrs << field_of_search_line( html[i] )
 		

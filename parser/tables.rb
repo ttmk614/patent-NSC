@@ -13,18 +13,37 @@ class USPC
 	attr_accessor :uspcLine, :uspcTable
 	def initialize(xml)
 		@uspcTable = Array.new
-		uspcLineTemp = xml.split("<b>")[1].split("</td>")[0].split("</b>  ; ")
-    	@uspcLine = uspcLineTemp[0]
-    	count = 0
-    	uspcLineTemp[1].split("; ").each do |each|
-    		@uspcTable[count] = Hash.new
-    		temp = each.split("/")
-    		@uspcTable[count]['level_1'] = temp[0]
-    		@uspcTable[count]['level_2'] = temp[1]
-    		@uspcTable[count]['USPC_class'] = each
-    		@uspcLine = @uspcLine + "#" + each
-    	end
-    	count += 1
+
+        if xml.count(";") > 0 then 
+    		uspcLineTemp = xml.split("<b>")[1].split("</td>")[0].split("</b>  ; ")
+        	@uspcLine = uspcLineTemp[0]
+
+            @uspcTable[0] = Hash.new
+            temp = uspcLineTemp[0].split("/")
+            @uspcTable[0]['level_1'] = temp[0]
+            @uspcTable[0]['level_2'] = temp[1]
+            @uspcTable[0]['USPC_class'] = uspcLineTemp[0]
+
+            count = 1
+            uspcLineTemp[1].split("; ").each do |each|
+            	@uspcTable[count] = Hash.new
+            	temp = each.split("/")
+            	@uspcTable[count]['level_1'] = temp[0]
+            	@uspcTable[count]['level_2'] = temp[1]
+            	@uspcTable[count]['USPC_class'] = each
+            	@uspcLine = @uspcLine + "#" + each
+                count += 1
+            end
+        else  #only 1 uspc class
+            uspcLineTemp = xml.split("<b>")[1].split("</td>")[0].split("</b>")
+            @uspcLine = uspcLineTemp[0]
+
+            @uspcTable[0] = Hash.new
+            temp = uspcLineTemp[0].split("/")
+            @uspcTable[0]['level_1'] = temp[0]
+            @uspcTable[0]['level_2'] = temp[1]
+            @uspcTable[0]['USPC_class'] = uspcLineTemp[0]
+        end  
   	end
 end
 
@@ -62,7 +81,6 @@ class IPC
     	end
   	end
 end
-
 # $test = '<td valign="TOP" align="RIGHT" width="80%">A61C 5/00&amp;nbsp(20060101); A61C 11/00&amp;nbsp(20060101); A61C 9/00&amp;nbsp(20060101)</td>'
 # a = IPC.new($test)
 # puts a.ipcLine
@@ -96,3 +114,7 @@ class CPC
     	end
   	end
 end
+# $test = '<td VALIGN=TOP ALIGN="RIGHT" WIDTH="80%">B63C 11/04&amp;nbsp(20130101)</td>'
+# a = CPC.new($test)
+# puts a.cpcLine
+# puts a.cpcTable
