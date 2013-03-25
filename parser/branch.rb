@@ -220,6 +220,10 @@ def getInventor(html)
 			if /Inventors:/ =~ tuple.content then
 				inventors_line = ''
 				tuple.css('td b').each do |info|
+					#puts info.content + info.next.content
+					if /^[A-Z][A-Z]$/ =~ info then
+						inventors_line += '%'
+					end
 					inventors_line = inventors_line + info.content.gsub(',', '#') + info.next.content
 				end
 				#puts inventors_line

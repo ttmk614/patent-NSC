@@ -1,11 +1,18 @@
 # inventer_table.rb
 # inventor_line = "Martinelli; Michael A. (Winchester, MA)#Haase; Wayne C. (Sterling, MA)#"
 def patentToInventor(patent_id, inventor_line)
-	inventor_line.split(')#').each do |inventor_info|
-		inventor_info = inventor_info.split(' (')
-		inventor, inventor_loc = inventor_info[0].strip, inventor_info[1].strip
-		puts inventor, inventor_loc
-		# insert into inventor (`patent_id`, `inventor_name`, `inventor_location`) values (patent_id, inventor, inventor_loc)
+	inventor_line.split('# ').each do |inventor_info|
+        inventor, tmp = inventor_info.split(' (')
+        inventor_location = tmp.gsub(')', "")
+        inventor_location_city, tmp = inventor_location.split(', ')
+        if /^\%/ =~ tmp then
+            inventor_location_country = tmp.gsub('%', '')
+            inventor_location_state = 'NULL'
+        else
+            inventor_location_country = tmp
+            inventor_location_state = 'USA'
+        end
+		# insert into inventor (`patent_id`, `inventor_name`, `inventor_location`, `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) values (patent_id, inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city)
 	end
 end
 
