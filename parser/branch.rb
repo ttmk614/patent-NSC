@@ -39,6 +39,20 @@ def description( html )
     return html.xpath('//text()')
 end
 ######################################################################################
+
+def related_patent( xml )
+    temp1 = Nokogiri::HTML(xml)
+    result = nil
+    temp1.xpath("//tr").each do |each|
+        if each.xpath("td")[3].text != ""
+            result = each.xpath("td")[3].text.upcase.gsub(/[^A-Z0-9]/, "")
+            result = result.gsub(/^0/,"")
+            break
+        end
+    end
+    result
+end
+
 class RelatedPatent
     attr_accessor :relatedTable
     def initialize(xml)
