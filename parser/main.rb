@@ -70,11 +70,12 @@ if ARGV.count > 0
 		#relt_issue_date = ""
 		print html[i].xpath("//text()")[0].to_s.strip 
 		if (html[i].xpath("//text()")[0].to_s.strip <=> "Related U.S. Patent Documents")==0
-			a = RelatedPatent.new(html[i+1].xpath("//tr")[2..-2].to_s)
-			patent_attrs << a.relatedTable[0]['relt_appl_id']
-			patent_attrs << a.relatedTable[0]['relt_filing_date']
-			patent_attrs << a.relatedTable[0]['relt_patent_id']
-			patent_attrs << a.relatedTable[0]['relt_issue_date']
+			# a = RelatedPatent.new(html[i+1].xpath("//tr")[2..-2].to_s)
+			# patent_attrs << a.relatedTable[0]['relt_appl_id']
+			# patent_attrs << a.relatedTable[0]['relt_filing_date']
+			# patent_attrs << a.relatedTable[0]['relt_patent_id']
+			# patent_attrs << a.relatedTable[0]['relt_issue_date']
+			patent_attrs << getRelatedPatent(html[i+1].xpath("//tr")[2..-2].to_s)
 			i += 2
 		end
 		
@@ -126,7 +127,7 @@ if ARGV.count > 0
 		# puts field_of_search_line
 		# puts reference
 		# puts primary_examiner
-		# puts relt_appl_id+ relt_filing_date+ relt_patent_id+ relt_issue_date
+		# puts relt_appl_id+ relt_filing_date+ relt_patent_id+ relt_issue_date -> only relt_patent_id
 		# puts USPC_line, IPC_line
 		# puts description
 

@@ -3,7 +3,7 @@ require 'nokogiri'
 require 'date' 
 
 def issued_year( patent_id )
-	2008
+	2010
 	#lines = File.read( "issueyear.txt" )
 end
 ######################################################################################
@@ -40,7 +40,7 @@ def description( html )
 end
 ######################################################################################
 
-def related_patent( xml )
+def getRelatedPatent( xml )
     temp1 = Nokogiri::HTML(xml)
     result = nil
     temp1.xpath("//tr").each do |each|
