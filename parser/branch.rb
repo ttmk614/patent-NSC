@@ -71,6 +71,20 @@ def description( html )
     return html.xpath('//text()')
 end
 ######################################################################################
+
+def getRelatedPatent( xml )
+    temp1 = Nokogiri::HTML(xml)
+    result = nil
+    temp1.xpath("//tr").each do |each|
+        if each.xpath("td")[3].text != ""
+            result = each.xpath("td")[3].text.upcase.gsub(/[^A-Z0-9]/, "")
+            result = result.gsub(/^0/,"")
+            break
+        end
+    end
+    result
+end
+
 class RelatedPatent
     attr_accessor :relatedTable
     def initialize(xml)
@@ -252,6 +266,10 @@ def getInventor(html)
 			if /Inventors:/ =~ tuple.content then
 				inventors_line = ''
 				tuple.css('td b').each do |info|
+					#puts info.content + info.next.content
+					if /^[A-Z][A-Z]$/ =~ info then
+						inventors_line += '%'
+					end
 					inventors_line = inventors_line + info.content.gsub(',', '#') + info.next.content
 				end
 				#puts inventors_line
