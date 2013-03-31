@@ -39,8 +39,9 @@ end
 #main######################################################
 if ARGV.count > 0
 	patent_id = ARGV[0]
-	puts "issued_year = #{issued_year(patent_id)}"
-	html = get_html( patent_id , issued_year( patent_id ))
+	issued_year_table = issued_year()
+	puts "issued_year = #{year_lookup(issued_year_table, patent_id)}"
+	html = get_html( patent_id , year_lookup(issued_year_table, patent_id))
 	tables = html[0].xpath('//table')
 	fonts = html[0].xpath('//font')
 	paragraphs = html[0].xpath('//p')
