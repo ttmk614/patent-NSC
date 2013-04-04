@@ -56,7 +56,7 @@ def assignee_line( html )
     info = html.xpath('//table/tr[2]/td[2]/b[2]')
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
     assignee[1..assignee.size-1].each do |span|
-    	span = span.to_s.strip
+    	span = span.to_s.strip.gsub(/\n/,"")
     	if /^[A-Z][A-Z]$/ =~ span then
     		if info.empty? then # usa, no %
 		    	assignee_line = assignee_line + span

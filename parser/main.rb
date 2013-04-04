@@ -47,29 +47,37 @@ if ARGV.count > 0
 	paragraphs = html[0].xpath('//p')
 	#table of Patent##########################
 		patent_attrs = []
+		i = 2
 		# A Patent_id := patent_id  
 		# A issue_date	
-		patent_attrs << issue_date( html[2] )
+		patent_attrs << issue_date( html[i] )
+		i += 1
+		# Claims for Design patent
+		# if (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")==0
+		# 	patent_attrs << getRelatedPatent(html[i+1].xpath("//tr")[2..-2].to_s)
+		# 	i += 2
+		# end
 		# A title		
-		patent_attrs << title( html[3] )
+		patent_attrs << title( html[i] )
 		# A abstract		
-		patent_attrs << abstract( html[3] )
+		patent_attrs << abstract( html[i] )
+		i += 1
 		# C inventors_line 
-		patent_attrs << getInventor(html[4])
+		patent_attrs << getInventor(html[i])
 		# A assignee_line  
-		patent_attrs << assignee_line( html[4] )
+		patent_attrs << assignee_line( html[i] )
 		# A	appl_id
-		patent_attrs << appl_id( html[4] )
+		patent_attrs << appl_id( html[i] )
 		# A	filing_date
-		patent_attrs << filing_date( html[4] )
-
-		i = 5
+		patent_attrs << filing_date( html[i] )
+		i += 1
+		# i = 5
 		# A	relt_appl_id, A	relt_filing_date, A	relt_patent_id, A relt_issue_date
 		#relt_appl_id = ""
 		#relt_filing_date = ""
 		#relt_patent_id = ""
 		#relt_issue_date = ""
-		print html[i].xpath("//text()")[0].to_s.strip 
+		# print html[i].xpath("//text()")[0].to_s.strip 
 		if (html[i].xpath("//text()")[0].to_s.strip <=> "Related U.S. Patent Documents")==0
 			# a = RelatedPatent.new(html[i+1].xpath("//tr")[2..-2].to_s)
 			# patent_attrs << a.relatedTable[0]['relt_appl_id']
@@ -101,17 +109,30 @@ if ARGV.count > 0
 
 		# A	primary_examiner
 		patent_attrs << primary_examiner( html[i] )
+		i += 1
 
+		while (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")!=0
+			i+=2
+		end
 		# Claims
 		# Class Claim
 		# => arg: paragraph
-		# =>  	
-			#claim = Claim.new( text['claim'] )
-			# B	claims_full
-			# B	claim_num
-			# B	dept_claim_num
-			# B	indept_claim_num
+		# =>  
+		print html[i+1].xpath('//body')[0].to_s
+		if (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")==0
+			claim = Claim.new( html[i+1].xpath('//body')[0].to_s.gsub(/<\/*body>/, "").gsub(/^.*(?=<)/, "" ))
 
+			# B	claims_full
+			patent_attrs << claim.claimsFull
+			print claim.claimsFull
+			# B	claim_num
+			patent_attrs << claim.claimNum
+			# B	dept_claim_num
+			patent_attrs << claim.deptClaimNum
+			# B	indept_claim_num
+			patent_attrs << claim.indeptClaimNum
+			i += 2
+		end
 		# A	description_full
 #		patent_attrs << description( html[-2] )
 		
