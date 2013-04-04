@@ -102,10 +102,7 @@ if ARGV.count > 0
 		# A	primary_examiner
 		patent_attrs << primary_examiner( html[i] )
 
-		# Claims
-		# Class Claim
-		# => arg: paragraph
-		# =>  	
+		# Claims	
 			#claim = Claim.new( text['claim'] )
 			# B	claims_full
 			# B	claim_num
@@ -113,7 +110,7 @@ if ARGV.count > 0
 			# B	indept_claim_num
 
 		# A	description_full
-#		patent_attrs << description( html[-2] )
+		# patent_attrs << description( html[-2] )
 		
 		patent_attrs.each do |x|
 			puts x
