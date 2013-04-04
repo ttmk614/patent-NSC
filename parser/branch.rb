@@ -52,7 +52,21 @@ def abstract( html )
 end
 def assignee_line( html )
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
-    assignee_line = assignee[1].to_s.strip + assignee[2].to_s.strip.gsub(/\s/, "")
+    assignee_line = ""
+    info = html.xpath('//table/tr[2]/td[2]/b[2]')
+    assignee = html.xpath('//table/tr[2]/td[2]//text()')
+    assignee[1..assignee.size-1].each do |span|
+    	span = span.to_s.strip
+    	if /^[A-Z][A-Z]$/ =~ span then
+    		if info.empty? then # usa, no %
+		    	assignee_line = assignee_line + span
+		    else #country name
+		    	assignee_line = assignee_line + '%' + span
+		    end
+    	else
+		    assignee_line += span + " "
+		end
+	end
     return assignee_line
 end
 def appl_id( html )
