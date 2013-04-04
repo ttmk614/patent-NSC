@@ -3,7 +3,7 @@ require 'nokogiri'
 require 'date' 
 
 def issued_year( patent_id )
-	2010
+	2008
 	#lines = File.read( "issueyear.txt" )
 end
 ######################################################################################
