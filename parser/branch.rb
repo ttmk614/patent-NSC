@@ -2,9 +2,41 @@ require 'rubygems'
 require 'nokogiri'
 require 'date' 
 
-def issued_year( patent_id )
-	2008
-	#lines = File.read( "issueyear.txt" )
+def issued_year( )
+	#2008
+	text = File.read( "../issueyear.txt" )
+	lines = text.split("\n")
+	table = Hash.new
+	lines.each do |line|
+		line = line.split(/\s+/)
+		table[line[0]] = line[1..line.size-1]
+	end
+	return table
+end
+def patent_type( patent_id )
+	if patent_id.include? "D"     
+		return 1
+	elsif patent_id.include? "PP" 
+		return 2
+	elsif patent_id.include? "RE" 
+		return 3
+	elsif patnet_id.include? "H"  
+		return 4
+	else 
+		return 0
+	end
+end
+def year_lookup( yearlist, patent_id )
+	type = patent_type( patent_id )
+	patent_year = 0
+	yearlist.each do |year, ids|
+		if ids[ type ].split(/[A-Z]+/).last.to_i <= patent_id.split(/[A-Z]+/).last.to_i
+			patent_year = year
+		else
+			break
+		end
+	end
+	return patent_year
 end
 ######################################################################################
 ######################################################################################
