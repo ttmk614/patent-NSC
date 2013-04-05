@@ -20,7 +20,7 @@ def patent_type( patent_id )
 		return 2
 	elsif patent_id.include? "RE" 
 		return 3
-	elsif patnet_id.include? "H"  
+	elsif patent_id.include? "H"  
 		return 4
 	else 
 		return 0
@@ -52,7 +52,21 @@ def abstract( html )
 end
 def assignee_line( html )
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
-    assignee_line = assignee[1].to_s.strip + assignee[2].to_s.strip.gsub(/\s/, "")
+    assignee_line = ""
+    info = html.xpath('//table/tr[2]/td[2]/b[2]')
+    assignee = html.xpath('//table/tr[2]/td[2]//text()')
+    assignee[1..assignee.size-1].each do |span|
+    	span = span.to_s.strip.gsub(/\n/,"")
+    	if /^[A-Z][A-Z]$/ =~ span then
+    		if info.empty? then # usa, no %
+		    	assignee_line = assignee_line + span
+		    else #country name
+		    	assignee_line = assignee_line + '%' + span
+		    end
+    	else
+		    assignee_line += span + " "
+		end
+	end
     return assignee_line
 end
 def appl_id( html )
@@ -68,7 +82,7 @@ def primary_examiner( html )
     return html.xpath('//text()')[-4].to_s.strip
 end
 def description( html )
-    return html.xpath('//text()')
+    return html.xpath('//text()').to_s.gsub(/'/, "''")
 end
 ######################################################################################
 

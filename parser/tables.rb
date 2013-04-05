@@ -14,6 +14,7 @@ def patentToInventor(patent_id, inventor_line)
         end
 		# insert into inventor (`patent_id`, `inventor_name`, `inventor_location`, `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) values (patent_id, inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city)
 	end
+    return [inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city]
 end
 
 class USPC
@@ -84,6 +85,8 @@ class IPC
 				@ipcTable[count]['IPC_class'] = ipcTable[count]['main_class'] + " " + ipcTable[count]['level_1'] + "/" + ipcTable[count]['level_2'] 
 				@ipcLine = @ipcLine + "#" + ipcTable[count]['IPC_class']
 			end
+            temp = @ipcLine
+            @ipcLine = temp[1..temp.length-1]
 			count += 1
     	end
   	end
@@ -117,6 +120,8 @@ class CPC
 				@cpcTable[count]['CPC_class'] = cpcTable[count]['main_class'] + " " + cpcTable[count]['level_1'] + "/" + cpcTable[count]['level_2'] 
 				@cpcLine = @cpcLine + "#" + cpcTable[count]['CPC_class']
 			end
+            temp = @cpcLine
+            @cpcLine = temp[1..temp.length-1]
 			count += 1
     	end
   	end
