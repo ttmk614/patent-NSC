@@ -1,7 +1,10 @@
 # inventer_table.rb
 # inventor_line = "Martinelli; Michael A. (Winchester, MA)#Haase; Wayne C. (Sterling, MA)#"
 def patentToInventor(patent_id, inventor_line)
+    inventors = Array.new
+    count = 0
 	inventor_line.split('# ').each do |inventor_info|
+        inventors[count] = Hash.new
         inventor, tmp = inventor_info.split(' (')
         inventor_location = tmp.gsub(')', "")
         inventor_location_city, tmp = inventor_location.split(', ')
@@ -12,9 +15,16 @@ def patentToInventor(patent_id, inventor_line)
             inventor_location_country = tmp
             inventor_location_state = 'USA'
         end
+        inventors[count]['inventor_name'] = inventor
+        inventors[count]['inventor_location'] = inventor_location
+        inventors[count]['inventor_location_country'] = inventor_location_country
+        inventors[count]['inventor_location_state'] = inventor_location_state
+        inventors[count]['inventor_location_city'] = inventor_location_city
+        inventors[count]['inventor_name'] = 
+        count += 1
 		# insert into inventor (`patent_id`, `inventor_name`, `inventor_location`, `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) values (patent_id, inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city)
 	end
-    return [inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city]
+    return inventors
 end
 
 class USPC

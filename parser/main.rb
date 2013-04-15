@@ -183,17 +183,22 @@ if ARGV.count > 0
 	inventor_info = patentToInventor(patent_id, patent_attrs[3] )
 	begin
 		Timeout::timeout(600){
-			s = "INSERT INTO `patent`.`inventor` 
-				(`patent_id`, `inventor_name`, `inventor_location`, 
-				 `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) 
-				VALUES ("
-			s = s + "'#{patent_id}'"
-			inventor_info.each do |att|
-				s = s + ", '#{att}'"
+			inventor_info.each do |row|
+				s = "INSERT INTO `patent`.`inventor` 
+					(`patent_id`, `inventor_name`, `inventor_location`, 
+					 `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) 
+					VALUES ("
+				s = s +  "'#{patent_id}', '#{row['inventor_name']}', '#{row['inventor_location']}', 
+						  '#{row['inventor_location_country']}', '#{row['inventor_location_state']}', '#{row['inventor_location_city']}'"
+				# inventor_info.each do |att|
+				# 	s = s + ", '#{att}'"
+				# end
+				s = s + ')'
+puts s
+				# File.open("query_inventor.txt", "w") { |file| file.write(s) }
+				@new_patent.query( s )
 			end
-			s = s + ')'
-			# File.open("query_inventor.txt", "w") { |file| file.write(s) }
-			# @new_patent.query( s )
+			
 			puts "inventor done!"
 		}
 	rescue => ex
