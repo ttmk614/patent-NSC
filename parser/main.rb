@@ -207,17 +207,16 @@ if ARGV.count > 0
 	begin
 		Timeout::timeout(600){
 			uspc.uspcTable.each do |row|
+
 				s = "INSERT INTO `patent`.`uspc` 
 					(`patent_id`, `USPC_class`, `level_1`, `level_2`) 
 					VALUES ("
-				s = s + "'#{patent_id}'"
-				row.each do |column|
-					s = s + ", '#{column}'"
-				end
+				s = s + "'#{patent_id}', '#{row['USPC_class']}', '#{row['level_1']}', '#{row['level_2']}'"
 				
 				s = s + ')'
 				# File.open("query_uspc.txt", "w") { |file| file.write(s) }
-				# @new_patent.query( s )
+
+				@new_patent.query( s )
 			end
 			puts "uspc done!"
 		}
@@ -231,16 +230,19 @@ if ARGV.count > 0
 	####################################################################################
 	begin
 		Timeout::timeout(600){
-			s = "INSERT INTO `patent`.`ipc` 
-				(`patent_id`, `IPC_line`, `main_class`, `level_1`, `level_2`, `version`) 
-				VALUES ("
-			s = s + "'#{patent_id}'"
 			ipc.ipcTable.each do |row|
-				s = s + ", '#{row}'"
+
+				s = "INSERT INTO `patent`.`ipc` 
+					(`patent_id`, `IPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
+					VALUES ("
+				s = s + "'#{patent_id}', '#{row['IPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
+				# ipc.ipcTable.each do |row|
+				# 	s = s + ", '#{row}'"
+				# end
+				s = s + ')'
+				# File.open("query_ipc.txt", "w") { |file| file.write(s) }
+				@new_patent.query( s )
 			end
-			s = s + ')'
-			# File.open("query_ipc.txt", "w") { |file| file.write(s) }
-			# @new_patent.query( s )
 			puts "ipc done!"
 		}
 	rescue => ex
@@ -253,16 +255,19 @@ if ARGV.count > 0
 	####################################################################################
 	begin
 		Timeout::timeout(600){
-			s = "INSERT INTO `patent`.`ipc` 
-				(`patent_id`, `CPC_full`, `main_class`, `level_1`, `level_2`, `version`) 
-				VALUES ("
-			s = s + "'#{patent_id}'"
 			ipc.ipcTable.each do |row|
-				s = s + ", '#{row}'"
+				s = "INSERT INTO `patent`.`cpc` 
+					(`patent_id`, `CPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
+					VALUES ("
+				s = s + "'#{patent_id}', '#{row['CPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
+				# s = s + "'#{patent_id}'"
+				# ipc.ipcTable.each do |row|
+				# 	s = s + ", '#{row}'"
+				# end
+				s = s + ')'
+				# File.open("query_cpc.txt", "w") { |file| file.write(s) }
+				@new_patent.query( s )
 			end
-			s = s + ')'
-			File.open("query_cpc.txt", "w") { |file| file.write(s) }
-			@new_patent.query( s )
 			puts "cpc done!"
 		}
 	rescue => ex
