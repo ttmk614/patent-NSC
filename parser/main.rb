@@ -236,9 +236,7 @@ if ARGV.count > 0
 					(`patent_id`, `IPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
 					VALUES ("
 				s = s + "'#{patent_id}', '#{row['IPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
-				# ipc.ipcTable.each do |row|
-				# 	s = s + ", '#{row}'"
-				# end
+
 				s = s + ')'
 				# File.open("query_ipc.txt", "w") { |file| file.write(s) }
 				@new_patent.query( s )
@@ -260,10 +258,7 @@ if ARGV.count > 0
 					(`patent_id`, `CPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
 					VALUES ("
 				s = s + "'#{patent_id}', '#{row['CPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
-				# s = s + "'#{patent_id}'"
-				# ipc.ipcTable.each do |row|
-				# 	s = s + ", '#{row}'"
-				# end
+
 				s = s + ')'
 				# File.open("query_cpc.txt", "w") { |file| file.write(s) }
 				@new_patent.query( s )
