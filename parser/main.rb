@@ -84,15 +84,16 @@ if ARGV.count > 0
 	########################### A	relt_appl_id, A	relt_filing_date, A	relt_patent_id, A relt_issue_date
 	# only one or more relt????????????????
 	if (html[i].xpath("//text()")[0].to_s.strip <=> "Related U.S. Patent Documents")==0
-		a = RelatedPatent.new(html[i+1].xpath("//tr")[2..-2].to_s)
-		# puts a.relatedTable
-		a.relatedTable[0].each do |content|
-			patent_attrs << content[1]
-		end
-		# patent_attrs << a.relatedTable[0][1][1]#-----------["relt_appl_id", "09490342"]---------
-		# patent_attrs << a.relatedTable[0][2][1]
-		# patent_attrs << a.relatedTable[0][3][1]
-		# patent_attrs << a.relatedTable[0][4][1]
+		patent_attrs << getRelatedPatent( html[i+1].xpath("//tr")[2..-2].to_s )
+		# a = RelatedPatent.new(html[i+1].xpath("//tr")[2..-2].to_s)
+		# # puts a.relatedTable
+		# a.relatedTable[0].each do |content|
+		# 	patent_attrs << content[1]
+		# end
+		# # patent_attrs << a.relatedTable[0][1][1]#-----------["relt_appl_id", "09490342"]---------
+		# # patent_attrs << a.relatedTable[0][2][1]
+		# # patent_attrs << a.relatedTable[0][3][1]
+		# # patent_attrs << a.relatedTable[0][4][1]
 		i += 2
 	else
 		(1..4).each do |j|
@@ -157,7 +158,7 @@ if ARGV.count > 0
 			s = "INSERT INTO `patent`.`patent` 
 				(`patent_id`, `issue_date`, `title`, `abstract`, 
 				 `inventors_line`, `assigne_line`, `appl_id`, `filing_date`, 
-				 `relt_appl_id`, `relt_filing_date`, `relt_patent_id`, `relt_issue_date`, 
+				 `relt_patent_id`,
 				 `USPC_line`, `IPC_line`, `CPC_line`, `field_of_search_line`, 
 				 `reference_USPTO`, `reference_foreign`, `reference_other`, 
 				 `primary_examiner`, `claim_full`, `claim_num`, `dept_claim_num`, `indept_claim_num`, `description_full`) 
@@ -205,16 +206,19 @@ if ARGV.count > 0
 	####################################################################################
 	begin
 		Timeout::timeout(600){
-			s = "INSERT INTO `patent`.`uspc` 
-				(`patent_id`, `USPC_class`, `level_1`, `level_2`) 
-				VALUES ("
-			s = s + "'#{patent_id}'"
-			 uspc.uspcTable.each do |row|
-				s = s + ", '#{row}'"
+			uspc.uspcTable.each do |row|
+				s = "INSERT INTO `patent`.`uspc` 
+					(`patent_id`, `USPC_class`, `level_1`, `level_2`) 
+					VALUES ("
+				s = s + "'#{patent_id}'"
+				row.each do |column|
+					s = s + ", '#{column}'"
+				end
+				
+				s = s + ')'
+				# File.open("query_uspc.txt", "w") { |file| file.write(s) }
+				# @new_patent.query( s )
 			end
-			s = s + ')'
-			# File.open("query_uspc.txt", "w") { |file| file.write(s) }
-			# @new_patent.query( s )
 			puts "uspc done!"
 		}
 	rescue => ex
