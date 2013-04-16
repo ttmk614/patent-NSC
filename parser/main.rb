@@ -103,7 +103,6 @@ if ARGV.count > 0
 	
 	########################### B	USPC_line
 	pctable = html[i].xpath("//table").last
-	print pctable.xpath("tr[2]/td[2]")[0].to_s
 	uspc = USPC.new(pctable.xpath("tr[1]/td[2]")[0].to_s)
 	# uspc = USPC.new(html[i].xpath("//tr[1]/td[2]")[0].to_s)
 	patent_attrs << uspc.uspcLine
@@ -197,7 +196,7 @@ if ARGV.count > 0
 				# 	s = s + ", '#{att}'"
 				# end
 				s = s + ')'
-puts s
+				# puts s
 				# File.open("query_inventor.txt", "w") { |file| file.write(s) }
 				@new_patent.query( s )
 			end
@@ -223,7 +222,6 @@ puts s
 				
 				s = s + ')'
 				# File.open("query_uspc.txt", "w") { |file| file.write(s) }
-
 				@new_patent.query( s )
 			end
 			puts "uspc done!"
