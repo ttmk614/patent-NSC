@@ -52,8 +52,8 @@ if ARGV.count > 0
 	issued_year_table = issued_year()
 	puts "issued_year = #{year_lookup(issued_year_table, patent_id)}"
 	html = get_html( patent_id , year_lookup(issued_year_table, patent_id))
-	tables = html[0].xpath('//table')
-	fonts = html[0].xpath('//font')
+	# tables = html[0].xpath('//table')
+	# fonts = html[0].xpath('//font')
 	paragraphs = html[0].xpath('//p')
 	#table of Patent##########################
 	patent_attrs = []
@@ -102,14 +102,17 @@ if ARGV.count > 0
 	end
 	
 	########################### B	USPC_line
-	uspc = USPC.new(html[i].xpath("//tr[1]/td[2]")[0].to_s)
+	pctable = html[i].xpath("//table").last
+	print pctable.xpath("tr[2]/td[2]")[0].to_s
+	uspc = USPC.new(pctable.xpath("tr[1]/td[2]")[0].to_s)
+	# uspc = USPC.new(html[i].xpath("//tr[1]/td[2]")[0].to_s)
 	patent_attrs << uspc.uspcLine
 	########################### B	IPC_line
-	ipc = IPC.new(html[i].xpath("//tr[2]/td[2]")[0].to_s)
+	ipc = IPC.new(pctable.xpath("tr[2]/td[2]")[0].to_s)
 	patent_attrs << ipc.ipcLine		
 	########################### B	CPC_line 
 	if (html[i].xpath("//text()")[0].to_s.strip <=> "Current CPC Class")==0
-		cpc = CPC.new(html[i].xpath("//tr[2]/td[2]")[0].to_s)
+		cpc = CPC.new(pctable.xpath("tr[2]/td[2]")[0].to_s)
 		patent_attrs << cpc.cpc_line
 	else
 		patent_attrs << nil
