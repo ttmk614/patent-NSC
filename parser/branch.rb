@@ -51,6 +51,7 @@ def abstract( html )
     return html.xpath('//p/text()')[0].to_s().strip.to_s.gsub(/'/, "''")
 end
 def assignee_line( html )
+    # puts html
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
     assignee_line = ""
     if !assignee.to_a.empty?
@@ -68,21 +69,22 @@ def assignee_line( html )
     		    assignee_line += span + " "
     		end
         end
-    else
-        info = html.xpath('//table/tr[2]/td[1]/b[2]')
-        assignee = html.xpath('//table/tr[2]/td[1]//text()')
-        assignee[1..assignee.size-1].each do |span|
-            span = span.to_s.strip.gsub(/\n/,"")
-            if /^[A-Z][A-Z]$/ =~ span then
-                if info.empty? then # usa, no %
-                    assignee_line = assignee_line + span
-                else #country name
-                    assignee_line = assignee_line + '%' + span
-                end
-            else
-                assignee_line += span + " "
-            end
-        end
+    # else
+    #     info = html.xpath('//table/tr[2]/td[1]/b[2]')
+    #     assignee = html.xpath('//table/tr[2]/td[1]//text()')
+    #     puts assignee
+    #     assignee[1..assignee.size-1].each do |span|
+    #         span = span.to_s.strip.gsub(/\n/,"")
+    #         if /^[A-Z][A-Z]$/ =~ span then
+    #             if info.empty? then # usa, no %
+    #                 assignee_line = assignee_line + span
+    #             else #country name
+    #                 assignee_line = assignee_line + '%' + span
+    #             end
+    #         else
+    #             assignee_line += span + " "
+    #         end
+    #     end
     end
     # print assignee_line
     return assignee_line
@@ -92,11 +94,12 @@ def appl_id( html )
 end
 def filing_date( html )
     # puts html.xpath('//table/tr[4]/td//text()').to_a.size
-    if !html.xpath('//table/tr[4]/td').to_a.size == 4
+    # if !html.xpath('//table/tr[4]/td').to_a.size == 4
+        # puts html.xpath('//table/tr[4]/td//text()')[1]
         return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
-    else
-        return Date.parse(html.xpath('//table/tr[4]/td//text()')[1].to_s.strip)
-    end
+    # else
+    #     return Date.parse(html.xpath('//table/tr[4]/td//text()')[1].to_s.strip)
+    # end
 end
 def field_of_search_line( html )
     return html.xpath('//tr[3]/td[2]//text()')[0].to_s.strip
@@ -310,7 +313,7 @@ def getInventor(html)
 					inventors_line = inventors_line + info.content.gsub(',', '#') + info.next.content
 				end
 				#puts inventors_line
-				return inventors_line
+				return inventors_line.to_s.gsub(/'/, "''") 
 			end
 		end
 	end

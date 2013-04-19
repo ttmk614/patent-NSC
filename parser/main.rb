@@ -15,10 +15,9 @@ puts "database connected"
 def get_html( patent_id, year )
     begin # Get HTML of patent_id
         s = "SELECT `Html` FROM `content_#{year}` WHERE `Patent_id`='#{patent_id}'"
-        puts s
         res = @new_patent.query( s )
         if res
-        	blocks = res.to_a[0]['Html'].split("<hr>")
+        	blocks = res.to_a[0]['Html'].gsub(/'/, "''").gsub(/<th/, "<td").gsub(/th>/, "td>").split("<hr>")
         	r = []
         	r << Nokogiri::parse(res.to_a[0]['Html'])
         	blocks.each do |block|
@@ -72,6 +71,11 @@ if ARGV.count > 0
 	########################### A abstract		
 	patent_attrs << abstract( html[i] )
 	i += 1
+
+	########################### Skip Design Patent's Claims
+	if (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")==0
+		i += 2	
+	end
 	########################### C inventors_line 
 	patent_attrs << getInventor(html[i])
 	########################### A assignee_line  
@@ -96,9 +100,10 @@ if ARGV.count > 0
 		# # patent_attrs << a.relatedTable[0][4][1]
 		i += 2
 	else
-		(1..4).each do |j|
-			patent_attrs << nil
-		end
+		# (1..4).each do |j|
+		# 	patent_attrs << nil
+		# end
+		patent_attrs << nil
 	end
 	
 	########################### B	USPC_line
@@ -108,7 +113,7 @@ if ARGV.count > 0
 	patent_attrs << uspc.uspcLine
 	########################### B	IPC_line
 	ipc = IPC.new(pctable.xpath("tr[2]/td[2]")[0].to_s)
-	patent_attrs << ipc.ipcLine		
+	patent_attrs << ipc.ipcLine	
 	########################### B	CPC_line 
 	if (html[i].xpath("//text()")[0].to_s.strip <=> "Current CPC Class")==0
 		cpc = CPC.new(pctable.xpath("tr[2]/td[2]")[0].to_s)
@@ -130,12 +135,13 @@ if ARGV.count > 0
 	patent_attrs << primary_examiner( html[i] )
 	i += 1
 
-	while (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")!=0
+
+	while html[i] && (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")!=0
 		i+=2
 	end
 
 	########################### Claims--claims_full, claim_num, dept_claim_num, indept_claim_num
-	if (html[i].xpath("//text()")[0].to_s.strip <=> "Claims")==0
+	if (html[i] && html[i].xpath("//text()")[0].to_s.strip <=> "Claims")==0
 		claim = Claim.new( html[i+1].xpath('//body')[0].to_s.gsub(/<\/*body>/, "").gsub(/^.*(?=<)/, "" ))
 		# print claim.claimsFull
 		patent_attrs << claim.claimsFull
@@ -170,7 +176,8 @@ if ARGV.count > 0
 				s = s + ", '#{att}'"
 			end
 			s = s + ')'
-			File.open("query.txt", "w") { |file| file.write(s) }
+			# puts patent_attrs.size
+			# File.open("query.txt", "w") { |file| file.write(s) }
 			@new_patent.query( s )
 			puts "patent done!"
 		}

@@ -34,7 +34,7 @@ class USPC
 
         if xml.count(";") > 0 then 
     		uspcLineTemp = xml.split("<b>")[1].split("</td>")[0].split(/<\/b>\s*; /)
-            puts uspcLineTemp
+            # puts uspcLineTemp
         	@uspcLine = uspcLineTemp[0]
 
             @uspcTable[0] = Hash.new
@@ -79,27 +79,32 @@ class IPC
 		@ipcTable = Array.new
 		@ipcLine = ""
 		count = 0
-    	ipcLineTemp.split("; ").each do |each|
-    		@ipcTable[count] = Hash.new
-    		temp1 = each.split(" ")
-    		@ipcTable[count]['main_class'] = temp1[0]
-    		temp2 = temp1[1].split("/")
-    		@ipcTable[count]['level_1'] = temp2[0]
-    		temp3 = temp2[1].split("&amp;nbsp(")
-    		@ipcTable[count]['level_2'] = temp3[0]
-    		if temp3[1] != nil 
-				@ipcTable[count]['version'] = temp3[1][0..3]+ "-" + temp3[1][4..5] + "-" + temp3[1][6..7]
-				@ipcTable[count]['IPC_class'] = ipcTable[count]['main_class'] + " " + ipcTable[count]['level_1'] + "/" + ipcTable[count]['level_2'] + "(" + temp3[1][0..7] + ")"
-				@ipcLine = @ipcLine + "#" + ipcTable[count]['IPC_class']
-			else
-				@ipcTable[count]['version'] = nil
-				@ipcTable[count]['IPC_class'] = ipcTable[count]['main_class'] + " " + ipcTable[count]['level_1'] + "/" + ipcTable[count]['level_2'] 
-				@ipcLine = @ipcLine + "#" + ipcTable[count]['IPC_class']
-			end
-            temp = @ipcLine
-            @ipcLine = temp[1..temp.length-1]
-			count += 1
-    	end
+        # puts ipcLineTemp.size
+        if ipcLineTemp.size != 9    #not design patent
+        	ipcLineTemp.split("; ").each do |each|
+        		@ipcTable[count] = Hash.new
+        		temp1 = each.split(" ")
+        		@ipcTable[count]['main_class'] = temp1[0]
+        		temp2 = temp1[1].split("/")
+        		@ipcTable[count]['level_1'] = temp2[0]
+        		temp3 = temp2[1].split("&amp;nbsp(")
+        		@ipcTable[count]['level_2'] = temp3[0]
+        		if temp3[1] != nil 
+    				@ipcTable[count]['version'] = temp3[1][0..3]+ "-" + temp3[1][4..5] + "-" + temp3[1][6..7]
+    				@ipcTable[count]['IPC_class'] = ipcTable[count]['main_class'] + " " + ipcTable[count]['level_1'] + "/" + ipcTable[count]['level_2'] + "(" + temp3[1][0..7] + ")"
+    				@ipcLine = @ipcLine + "#" + ipcTable[count]['IPC_class']
+    			else
+    				@ipcTable[count]['version'] = nil
+    				@ipcTable[count]['IPC_class'] = ipcTable[count]['main_class'] + " " + ipcTable[count]['level_1'] + "/" + ipcTable[count]['level_2'] 
+    				@ipcLine = @ipcLine + "#" + ipcTable[count]['IPC_class']
+    			end
+                temp = @ipcLine
+                @ipcLine = temp[1..temp.length-1]
+    			count += 1
+        	end
+        else
+            @ipcLine = ipcLineTemp.gsub(/<\/td/,"").strip
+        end
   	end
 end
 # $test = '<td valign="TOP" align="RIGHT" width="80%">A61C 5/00&amp;nbsp(20060101); A61C 11/00&amp;nbsp(20060101); A61C 9/00&amp;nbsp(20060101)</td>'
