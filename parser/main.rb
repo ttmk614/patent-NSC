@@ -49,7 +49,8 @@ end
 if ARGV.count > 0
 	patent_id = ARGV[0]
 	issued_year_table = issued_year()
-	puts "issued_year = #{year_lookup(issued_year_table, patent_id)}"
+	issued_year = year_lookup(issued_year_table, patent_id)
+	puts issued_year
 	html = get_html( patent_id , year_lookup(issued_year_table, patent_id))
 	# tables = html[0].xpath('//table')
 	# fonts = html[0].xpath('//font')
@@ -163,7 +164,7 @@ if ARGV.count > 0
 	# INSERTION
 	begin
 		Timeout::timeout(600){
-			s = "INSERT INTO `patent`.`patent` 
+			s = "INSERT INTO `patent`.`patent_#{issued_year}` 
 				(`patent_id`, `issue_date`, `title`, `abstract`, 
 				 `inventors_line`, `assigne_line`, `appl_id`, `filing_date`, 
 				 `relt_patent_id`,
@@ -193,7 +194,7 @@ if ARGV.count > 0
 	begin
 		Timeout::timeout(600){
 			inventor_info.each do |row|
-				s = "INSERT INTO `patent`.`inventor` 
+				s = "INSERT INTO `patent`.`inventor_#{issued_year}` 
 					(`patent_id`, `inventor_name`, `inventor_location`, 
 					 `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) 
 					VALUES ("
@@ -222,7 +223,7 @@ if ARGV.count > 0
 		Timeout::timeout(600){
 			uspc.uspcTable.each do |row|
 
-				s = "INSERT INTO `patent`.`uspc` 
+				s = "INSERT INTO `patent`.`uspc_#{issued_year}` 
 					(`patent_id`, `USPC_class`, `level_1`, `level_2`) 
 					VALUES ("
 				s = s + "'#{patent_id}', '#{row['USPC_class']}', '#{row['level_1']}', '#{row['level_2']}'"
@@ -245,7 +246,7 @@ if ARGV.count > 0
 		Timeout::timeout(600){
 			ipc.ipcTable.each do |row|
 
-				s = "INSERT INTO `patent`.`ipc` 
+				s = "INSERT INTO `patent`.`ipc_#{issued_year}` 
 					(`patent_id`, `IPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
 					VALUES ("
 				s = s + "'#{patent_id}', '#{row['IPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
@@ -267,7 +268,7 @@ if ARGV.count > 0
 	begin
 		Timeout::timeout(600){
 			ipc.ipcTable.each do |row|
-				s = "INSERT INTO `patent`.`cpc` 
+				s = "INSERT INTO `patent`.`cpc_#{issued_year}` 
 					(`patent_id`, `CPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
 					VALUES ("
 				s = s + "'#{patent_id}', '#{row['CPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
