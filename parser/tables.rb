@@ -20,7 +20,7 @@ def patentToInventor(patent_id, inventor_line)
         inventors[count]['inventor_location_country'] = inventor_location_country
         inventors[count]['inventor_location_state'] = inventor_location_state
         inventors[count]['inventor_location_city'] = inventor_location_city
-        inventors[count]['inventor_name'] = 
+        # inventors[count]['inventor_name'] = 
         count += 1
 		# insert into inventor (`patent_id`, `inventor_name`, `inventor_location`, `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) values (patent_id, inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city)
 	end

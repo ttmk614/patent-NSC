@@ -48,7 +48,7 @@ def title( html )
      return html.xpath('//font/text()')[0].to_s().strip
 end
 def abstract( html )
-    return html.xpath('//p/text()')[0].to_s().strip
+    return html.xpath('//p/text()')[0].to_s().strip.to_s.gsub(/'/, "''")
 end
 def assignee_line( html )
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
@@ -180,7 +180,7 @@ class Claim
         @claimNum = xml.scan(/<br><br>/).length
         @deptClaimNum = xml.scan(/claim/).length
         @indeptClaimNum = @claimNum - @deptClaimNum
-        temp = xml.gsub(/^<br><br>/, "#")   #for the first '#'
+        temp = xml.gsub(/^<br><br>/, "#").to_s.gsub(/'/, "''")   #for the first '#'
         @claimsFull = temp[2..temp.length-1]
     end
 end
