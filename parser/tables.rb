@@ -33,7 +33,8 @@ class USPC
 		@uspcTable = Array.new
 
         if xml.count(";") > 0 then 
-    		uspcLineTemp = xml.split("<b>")[1].split("</td>")[0].split("</b>  ; ")
+    		uspcLineTemp = xml.split("<b>")[1].split("</td>")[0].split(/<\/b>\s*; /)
+            puts uspcLineTemp
         	@uspcLine = uspcLineTemp[0]
 
             @uspcTable[0] = Hash.new

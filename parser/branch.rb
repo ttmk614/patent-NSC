@@ -53,27 +53,50 @@ end
 def assignee_line( html )
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
     assignee_line = ""
-    info = html.xpath('//table/tr[2]/td[2]/b[2]')
-    assignee = html.xpath('//table/tr[2]/td[2]//text()')
-    assignee[1..assignee.size-1].each do |span|
-    	span = span.to_s.strip.gsub(/\n/,"")
-    	if /^[A-Z][A-Z]$/ =~ span then
-    		if info.empty? then # usa, no %
-		    	assignee_line = assignee_line + span
-		    else #country name
-		    	assignee_line = assignee_line + '%' + span
-		    end
-    	else
-		    assignee_line += span + " "
-		end
-	end
+    if !assignee.to_a.empty?
+        info = html.xpath('//table/tr[2]/td[2]/b[2]')
+        assignee = html.xpath('//table/tr[2]/td[2]//text()')
+        assignee[1..assignee.size-1].each do |span|
+        	span = span.to_s.strip.gsub(/\n/,"")
+        	if /^[A-Z][A-Z]$/ =~ span then
+        		if info.empty? then # usa, no %
+    		    	assignee_line = assignee_line + span
+    		    else #country name
+    		    	assignee_line = assignee_line + '%' + span
+    		    end
+        	else
+    		    assignee_line += span + " "
+    		end
+        end
+    else
+        info = html.xpath('//table/tr[2]/td[1]/b[2]')
+        assignee = html.xpath('//table/tr[2]/td[1]//text()')
+        assignee[1..assignee.size-1].each do |span|
+            span = span.to_s.strip.gsub(/\n/,"")
+            if /^[A-Z][A-Z]$/ =~ span then
+                if info.empty? then # usa, no %
+                    assignee_line = assignee_line + span
+                else #country name
+                    assignee_line = assignee_line + '%' + span
+                end
+            else
+                assignee_line += span + " "
+            end
+        end
+    end
+    # print assignee_line
     return assignee_line
 end
 def appl_id( html )
     return html.xpath('//table/tr[3]/td[2]//text()').to_s.strip.gsub(/,/, "")
 end
 def filing_date( html )
-    return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
+    # puts html.xpath('//table/tr[4]/td//text()').to_a.size
+    if !html.xpath('//table/tr[4]/td').to_a.size == 4
+        return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
+    else
+        return Date.parse(html.xpath('//table/tr[4]/td//text()')[1].to_s.strip)
+    end
 end
 def field_of_search_line( html )
     return html.xpath('//tr[3]/td[2]//text()')[0].to_s.strip

@@ -168,7 +168,7 @@ if ARGV.count > 0
 				s = s + ", '#{att}'"
 			end
 			s = s + ')'
-			# File.open("query.txt", "w") { |file| file.write(s) }
+			File.open("query.txt", "w") { |file| file.write(s) }
 			@new_patent.query( s )
 			puts "patent done!"
 		}
@@ -194,7 +194,6 @@ if ARGV.count > 0
 				# 	s = s + ", '#{att}'"
 				# end
 				s = s + ')'
-puts s
 				# File.open("query_inventor.txt", "w") { |file| file.write(s) }
 				@new_patent.query( s )
 			end
