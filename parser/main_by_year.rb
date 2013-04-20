@@ -64,13 +64,13 @@ if ARGV.count > 0
 	#puts issued_year
 	issued_year = ARGV.shift
 	patent_index = ARGV.shift.to_i
-	count = total_count(issued_year)
-	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, #{count}"
+	#count = total_count(issued_year)
+	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, 1"
 	@new_patent.query(s).to_a.each do |row|
 		#if row['Index'].to_i < patent_index
 		#	next
 		#end
-		puts row['Index'] + "\t" + row['Patent_id']
+		puts "#{row['Index'].to_s}\t#{row['Patent_id'].to_s}"
 		patent_id = row['Patent_id']
 		html = get_html(row['Html'])
 		# tables = html[0].xpath('//table')
