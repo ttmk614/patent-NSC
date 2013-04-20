@@ -16,7 +16,7 @@ if ARGV.count > 0
 		puts "wrong input"
 	else
 		# year = ARGV[0]
-		@new_patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'new_patent')
+		@new_patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'patent')
 
 		for year in from..to
 			s = " CREATE  TABLE  `patent`.`patent_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,

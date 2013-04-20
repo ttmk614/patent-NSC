@@ -9,7 +9,7 @@ require_relative  'branch'
 require_relative  'tables'
 
 @new_patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'new_patent')
-@patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'patent')
+# @patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'patent')
 puts "database connected"
 
 def get_html( html )
@@ -34,21 +34,11 @@ def get_html( html )
     	retry
     end
 end 
-def reconnect_patent()
-	@patent.close
-	puts "Reconnecting to database `patent`... "
-	@patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'patent')
-	puts "Reconnected! \n"
-end
 def reconnect_new_patent()
 	@new_patent.close
 	puts "Reconnecting to database `new_patent`... "
 	@new_patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'new_patent')
 	puts "Reconnected! \n"
-end
-def total_count(year)
-  count = @new_patent.query("SELECT COUNT(*) FROM  `content_#{year}`").to_a[0]['COUNT(*)']
-  return count.to_i
 end
 # def reconnect_patent()
 # 	@patent.close
@@ -57,22 +47,23 @@ end
 # 	puts "Reconnected! \n"
 # end
 #main######################################################
-if ARGV.count > 0
-
+if ARGV.count != 0
+	#patent_id = ARGV[0]
 	#issued_year_table = issued_year()
 	#issued_year = year_lookup(issued_year_table, patent_id)
 	#puts issued_year
-	issued_year = ARGV.shift
+	#html = get_html( patent_id , year_lookup(issued_year_table, patent_id))
+	year = ARGV.shift
 	patent_index = ARGV.shift.to_i
-	count = total_count(issued_year)
-	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, #{count}"
+	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{year}` WITH (INDEX(#{patent_index.to_i}))"
 	@new_patent.query(s).to_a.each do |row|
 		#if row['Index'].to_i < patent_index
 		#	next
 		#end
-		puts row['Index'] + "\t" + row['Patent_id']
+		p row['Patent_id'], row['Html']
 		patent_id = row['Patent_id']
 		html = get_html(row['Html'])
+		puts row['Patent_id'] + row['Html']
 		# tables = html[0].xpath('//table')
 		# fonts = html[0].xpath('//font')
 		paragraphs = html[0].xpath('//p')
@@ -148,10 +139,11 @@ if ARGV.count > 0
 		i += 2
 
 		########################### C	Reference_USPTO, Reference_Foreign, Reference_Other
-		reference = getReferences(issued_year, patent_id, html[i].to_s)
+		reference = getReferences(html[i].to_s)
 		patent_attrs << reference['references_uspto']
 		patent_attrs << reference['references_foreign']
 		patent_attrs << reference['other_references']
+		p reference
 
 		########################### A	primary_examiner
 		patent_attrs << primary_examiner( html[i] )
@@ -200,12 +192,12 @@ if ARGV.count > 0
 				s = s + ')'
 				# puts patent_attrs.size
 				# File.open("query.txt", "w") { |file| file.write(s) }
-				@patent.query( s )
+				@new_patent.query( s )
 				puts "patent done!"
 			}
 		rescue => ex
-		    puts "Error: #{ex}"
-			reconnect_patent()
+		    puts "Error: #{ex}","patent_index: #{patent_index}"
+			reconnect_new_patent()
 			retry
 		end
 		####################################################################################
@@ -227,14 +219,14 @@ if ARGV.count > 0
 					s = s + ')'
 
 					# File.open("query_inventor.txt", "w") { |file| file.write(s) }
-					@patent.query( s )
+					@new_patent.query( s )
 				end
 				
 				puts "inventor done!"
 			}
 		rescue => ex
 		    puts "Error: #{ex}"
-			reconnect_patent()
+			reconnect_new_patent()
 			retry
 		end
 		####################################################################################
@@ -251,13 +243,13 @@ if ARGV.count > 0
 					
 					s = s + ')'
 					# File.open("query_uspc.txt", "w") { |file| file.write(s) }
-					@patent.query( s )
+					@new_patent.query( s )
 				end
 				puts "uspc done!"
 			}
 		rescue => ex
 		    puts "Error: #{ex}"
-			reconnect_patent()
+			reconnect_new_patent()
 			retry
 		end
 		####################################################################################
@@ -274,13 +266,13 @@ if ARGV.count > 0
 
 					s = s + ')'
 					# File.open("query_ipc.txt", "w") { |file| file.write(s) }
-					@patent.query( s )
+					@new_patent.query( s )
 				end
 				puts "ipc done!"
 			}
 		rescue => ex
 		    puts "Error: #{ex}"
-			reconnect_patent()
+			reconnect_new_patent()
 			retry
 		end
 		####################################################################################
@@ -296,13 +288,13 @@ if ARGV.count > 0
 
 					s = s + ')'
 					# File.open("query_cpc.txt", "w") { |file| file.write(s) }
-					@patent.query( s )
+					@new_patent.query( s )
 				end
 				puts "cpc done!"
 			}
 		rescue => ex
 		    puts "Error: #{ex}"
-			reconnect_patent()
+			reconnect_new_patent()
 			retry
 		end
 		####################################################################################

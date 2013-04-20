@@ -250,21 +250,22 @@ end
 
 ############################################################################################3
 
-def getReferences(html)
-translator = Hash.new
-translator = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06', 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12'}
+def getReferences(year, patent_id, html)
+    @patent = Mysql2::Client.new(:host => '140.112.107.1', :username => 'chuya', :password=> '0514', :database => 'patent')
 
+    translator = Hash.new
+    translator = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' => '05', 'Jun' => '06', 'Jul' => '07', 'Aug' => '08', 'Sep' => '09', 'Oct' => '10', 'Nov' => '11', 'Dec' => '12'}
 	doc = Nokogiri::HTML(html)
-	ref = {}
+	reference = Hash.new
 	doc.css('center').each do |ref|
 		if /Other References/ =~ ref.content then
 			other_references = ''
 			ref.next_element.css('br').each do |refcon|
 				other_references = other_references + refcon.next.content.gsub(' cited by other', '') + "#"
-				# insert into `reference` (`patent_id`, `ref_type`, `ref_full`) values (patent_id, '3', refcon)
+				@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '3', \"#{refcon.text}\", '')")
 			end
-			ref['other_references'] = other_references.gsub('.#', '#')
-			#puts other_references.gsub('.#', '#') ==> problems!
+			reference['other_references'] = other_references.gsub('.#', '#')
+			#puts other_references, '--------------------'
 		elsif /U.S. Patent Documents/ =~ ref.content then
 			references_uspto = ''
 			ref.next_element.css('tr td a').each do |record|
@@ -274,10 +275,10 @@ translator = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' 
 				mm, yy = date.split(' ')
 				ref_full = record.to_str + ';' + translator[mm[0..2]]  + '-' + yy + ';' + assignee
 				# puts full_ref					# => 6701179;03;Martinelli et al.
-				# insert into `reference` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) values (patent_id, '1', full_ref, record) 
+				@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '1', \"#{ref_full}\", \"#{record.text}\") ")
 			end
-			ref['references_uspto'] = references_uspto
-			#puts references_uspto
+			reference['references_uspto'] = references_uspto
+			#puts references_uspto, '--------------------'
 		elsif /Foreign Patent Documents/ =~ ref.content then
 			references_foreign = ''
 			ref.next_element.css('tr td').each do |record|
@@ -288,14 +289,15 @@ translator = {'Jan' => '01', 'Feb' => '02', 'Mar' => '03', 'Apr' => '04', 'May' 
 					mm, yy = date.split('., ')
 					ref_full = record.to_str + ';' + translator[mm] + '-' + yy + ';' + country
 					# puts ref_full # => 964149;03-1975;CA
-					# insert into `reference` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) values (patent_id, '1', full_ref, record) 
+					@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '2', \"#{ref_full}\", \"#{record.text}\")")
 				end
 			end
-			ref['references_foreign'] = references_foreign
-			#puts references_foreign
+			reference['references_foreign'] = references_foreign
+			#puts references_foreign, '--------------------'
 		end
 	end
-	return ref
+    #p 'reference_hash', reference
+	return reference
 end
 
 def getInventor(html)
