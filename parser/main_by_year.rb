@@ -64,8 +64,8 @@ if ARGV.count > 0
 	#puts issued_year
 	issued_year = ARGV.shift
 	patent_index = ARGV.shift.to_i
-	#count = total_count(issued_year)
-	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, 1"
+	count = total_count(issued_year)
+	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, #{count}"
 	@new_patent.query(s).to_a.each do |row|
 		#if row['Index'].to_i < patent_index
 		#	next
