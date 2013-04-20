@@ -66,7 +66,7 @@ if ARGV.count > 0
 				 `level_2` varchar( 10  )  NOT  NULL ,
 				 `version` varchar( 10  )  NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
 			@new_patent.query( s )
-
+			# ref_uspto_patent_id 可為null！
 			s = " CREATE  TABLE  `patent`.`reference_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,
 				 `ref_type` varchar( 2  )  NOT  NULL ,
 				 `ref_full` text NOT  NULL ,

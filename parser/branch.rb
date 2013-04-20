@@ -261,8 +261,9 @@ def getReferences(year, patent_id, html)
 		if /Other References/ =~ ref.content then
 			other_references = ''
 			ref.next_element.css('br').each do |refcon|
-				other_references = other_references + refcon.next.content.gsub(' cited by other', '') + "#"
-				@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '3', \"#{refcon.text}\", '')")
+                record = refcon.next.content.gsub(' cited by other', '').chomp
+				other_references = other_references + record + "#"
+				@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '3', \'#{record.to_s}\', '')")
 			end
 			reference['other_references'] = other_references.gsub('.#', '#')
 			#puts other_references, '--------------------'
@@ -275,7 +276,7 @@ def getReferences(year, patent_id, html)
 				mm, yy = date.split(' ')
 				ref_full = record.to_str + ';' + translator[mm[0..2]]  + '-' + yy + ';' + assignee
 				# puts full_ref					# => 6701179;03;Martinelli et al.
-				@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '1', \"#{ref_full}\", \"#{record.text}\") ")
+				@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '1', \'#{ref_full}\', \"#{record.text}\") ")
 			end
 			reference['references_uspto'] = references_uspto
 			#puts references_uspto, '--------------------'
