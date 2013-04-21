@@ -40,15 +40,17 @@ if ARGV.count > 0
 				 `claim_num` int( 11  )  NOT  NULL ,
 				 `dept_claim_num` int( 11  )  NOT  NULL ,
 				 `indept_claim_num` int( 11  )  NOT  NULL ,
-				 `description_full` text NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
+				 `description_full` text NOT  NULL ,
+				 `inventor_num` varchar( 10  )  NOT  NULL ,
+				 `assignee_num` varchar( 10  )  NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
 			@new_patent.query( s )
 
 			s = " CREATE  TABLE  `patent`.`cpc_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,
 				 `CPC_class` text NOT  NULL ,
 				 `main_class` varchar( 10  )  NOT  NULL ,
-				 `level_1` varchar( 10  )  NOT  NULL ,
-				 `level_2` varchar( 10  )  NOT  NULL ,
-				 `version` varchar( 10  )  NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
+				 `level_1` varchar( 10  ) ,
+				 `level_2` varchar( 10  ) ,
+				 `version` varchar( 10  )  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
 			@new_patent.query( s )
 			
 			s = " CREATE  TABLE  `patent`.`inventor_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,
@@ -61,22 +63,22 @@ if ARGV.count > 0
 
 			s = " CREATE  TABLE  `patent`.`ipc_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,
 				 `IPC_class` text NOT  NULL ,
-				 `main_class` varchar( 10  )  NOT  NULL ,
-				 `level_1` varchar( 10  )  NOT  NULL ,
-				 `level_2` varchar( 10  )  NOT  NULL ,
-				 `version` varchar( 10  )  NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
+				 `main_class` varchar( 10  ) ,
+				 `level_1` varchar( 10  ) ,
+				 `level_2` varchar( 10  ) ,
+				 `version` varchar( 10  )  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
 			@new_patent.query( s )
-			# ref_uspto_patent_id 可為null！
+
 			s = " CREATE  TABLE  `patent`.`reference_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,
 				 `ref_type` varchar( 2  )  NOT  NULL ,
 				 `ref_full` text NOT  NULL ,
-				 `ref_uspto_patent_id` varchar( 20  )  NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
+				 `ref_uspto_patent_id` varchar( 20  )  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
 			@new_patent.query( s )
 
 			s = " CREATE  TABLE  `patent`.`uspc_#{year}` (  `patent_id` varchar( 20  )  NOT  NULL ,
 				 `USPC_class` varchar( 20  )  NOT  NULL ,
-				 `level_1` varchar( 10  )  NOT  NULL ,
-				 `level_2` varchar( 10  )  NOT  NULL  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
+				 `level_1` varchar( 10  ) ,
+				 `level_2` varchar( 10  )  ) ENGINE  =  MyISAM  DEFAULT CHARSET  = utf8;"
 			@new_patent.query( s )
 		end
 

@@ -86,7 +86,9 @@ if ARGV.count > 0
 	########################### C inventors_line 
 	patent_attrs << getInventor(html[i])
 	########################### A assignee_line  
-	patent_attrs << assignee_line( html[i] )
+	assigneeTemp = assignee_line( html[i] )
+	patent_attrs << assigneeTemp
+	assignee_num = assigneeTemp == "" ? "0" : "1"
 	########################### A	appl_id
 	patent_attrs << appl_id( html[i] )
 	########################### A	filing_date
@@ -168,6 +170,7 @@ if ARGV.count > 0
 	# end
 	# MEMO: patent_id is not added into array patent_attrs
 	# INSERTION
+	inventor_info = patentToInventor(patent_id, patent_attrs[3] )
 	begin
 		Timeout::timeout(600){
 			s = "INSERT INTO `patent`.`patent_#{issued_year}` 
@@ -176,13 +179,15 @@ if ARGV.count > 0
 				 `relt_patent_id`,
 				 `USPC_line`, `IPC_line`, `CPC_line`, `field_of_search_line`, 
 				 `reference_USPTO`, `reference_foreign`, `reference_other`, 
-				 `primary_examiner`, `claim_full`, `claim_num`, `dept_claim_num`, `indept_claim_num`, `description_full`) 
+				 `primary_examiner`, `claim_full`, `claim_num`, `dept_claim_num`, `indept_claim_num`, `description_full`,
+				 `inventor_num`, `assignee_num`) 
 				VALUES ("
 			s = s + "'#{patent_id}'"
 			patent_attrs.each do |att|
 				s = s + ", '#{att}'"
 			end
-			s = s + ')'
+
+			s = s + ", '#{inventor_info.size}', '#{assignee_num}' )"
 			# puts patent_attrs.size
 			# File.open("query.txt", "w") { |file| file.write(s) }
 			@patent.query( s )
@@ -196,7 +201,7 @@ if ARGV.count > 0
 	####################################################################################
 	#table of Inventor##################################################################
 	####################################################################################
-	inventor_info = patentToInventor(patent_id, patent_attrs[3] )
+	# inventor_info = patentToInventor(patent_id, patent_attrs[3] ) 為了計算inventor_num移到patent table插入之前
 	begin
 		Timeout::timeout(600){
 			inventor_info.each do |row|
