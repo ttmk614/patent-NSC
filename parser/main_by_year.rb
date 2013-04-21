@@ -65,7 +65,7 @@ if ARGV.count > 0
 	issued_year = ARGV.shift
 	patent_index = ARGV.shift.to_i
 	count = total_count(issued_year)
-	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, #{count}"
+	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, 30"#{count}"
 	puts s.to_s
 	@new_patent.query(s).to_a.each do |row|
 		#if row['Index'].to_i < patent_index
@@ -140,6 +140,7 @@ if ARGV.count > 0
 		ipc = IPC.new(pctable.xpath("tr[2]/td[2]")[0].to_s)
 		patent_attrs << ipc.ipcLine	
 		########################### B	CPC_line 
+		cpc = nil
 		if (html[i].xpath("//text()")[0].to_s.strip <=> "Current CPC Class")==0
 			cpc = CPC.new(pctable.xpath("tr[2]/td[2]")[0].to_s)
 			patent_attrs << cpc.cpc_line
@@ -294,17 +295,19 @@ if ARGV.count > 0
 		####################################################################################
 		begin
 			Timeout::timeout(600){
-				cpc.cpcTable.each do |row|
-					s = "INSERT INTO `patent`.`cpc_#{issued_year}` 
-						(`patent_id`, `CPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
-						VALUES ("
-					s = s + "'#{patent_id}', '#{row['CPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
+				if cpc != nil
+					cpc.cpcTable.each do |row|
+						s = "INSERT INTO `patent`.`cpc_#{issued_year}` 
+							(`patent_id`, `CPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
+							VALUES ("
+						s = s + "'#{patent_id}', '#{row['CPC_class']}', '#{row['main_class']}', '#{row['level_1']}', '#{row['level_2']}', '#{row['version']}'"
 
-					s = s + ')'
-					# File.open("query_cpc.txt", "w") { |file| file.write(s) }
-					@patent.query( s )
+						s = s + ')'
+						# File.open("query_cpc.txt", "w") { |file| file.write(s) }
+						@patent.query( s )
+					end
+					puts "cpc done!"
 				end
-				puts "cpc done!"
 			}
 		rescue => ex
 		    puts "Error: #{ex}"
