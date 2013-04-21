@@ -18,7 +18,7 @@ def get_html( html )
         #puts s
         #res = @new_patent.query( s )
         if html
-        	blocks = html.split("<hr>")
+        	blocks = html.gsub(/'/, "''").gsub(/<th/, "<td").gsub(/th>/, "td>").split("<hr>")
         	r = []
         	r << Nokogiri::parse(html)
         	blocks.each do |block|
@@ -66,6 +66,7 @@ if ARGV.count > 0
 	patent_index = ARGV.shift.to_i
 	count = total_count(issued_year)
 	s = "SELECT `Index`, `Patent_id`, `Html` FROM `content_#{issued_year}` ORDER BY `Index` ASC LIMIT #{patent_index-1}, #{count}"
+	puts s.to_s
 	@new_patent.query(s).to_a.each do |row|
 		#if row['Index'].to_i < patent_index
 		#	next
