@@ -54,7 +54,7 @@ def assignee_line( html )
     # puts html
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
     if assignee.to_s.split("),").size > 2    #multiplie assignee
-        File.open("multiple_assignee.txt", "w") { |file| file.write() }
+        # File.open("multiple_assignee.txt", "w") { |file| file.write() }
     end
     assignee_line = ""
     if !assignee.to_a.empty?
@@ -99,11 +99,18 @@ def filing_date( html )
     # puts html.xpath('//table/tr[4]/td//text()').to_a.size
     # if !html.xpath('//table/tr[4]/td').to_a.size == 4
         # puts html.xpath('//table/tr[4]/td//text()')[1]
-        if !html.xpath('//table/tr[4]/td//text()')[2].to_s.strip.empty?
-            return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
-        else
-            return Date.parse(html.xpath('//table/tr[3]/td//text()')[2].to_s.strip)    
+    begin
+        return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
+    rescue  #若html檔資料格式不同則每個都試試看
+        html.xpath('//text()').each do |each|
+            begin
+                return Date.parse(each.to_s.strip)
+            rescue
+                next
+            end
         end
+        #do something if invalid
+    end
 
         # puts html.xpath('//table/tr[4]/td//text()')[2].to_s.strip
         

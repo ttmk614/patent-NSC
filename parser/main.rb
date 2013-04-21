@@ -278,7 +278,7 @@ if ARGV.count > 0
 	####################################################################################
 	begin
 		Timeout::timeout(600){
-			ipc.ipcTable.each do |row|
+			cpc.cpcTable.each do |row|
 				s = "INSERT INTO `patent`.`cpc_#{issued_year}` 
 					(`patent_id`, `CPC_class`, `main_class`, `level_1`, `level_2`, `version`) 
 					VALUES ("

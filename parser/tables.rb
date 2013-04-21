@@ -144,6 +144,7 @@ class CPC
 				@cpcTable[count]['CPC_class'] = cpcTable[count]['main_class'] + " " + cpcTable[count]['level_1'] + "/" + cpcTable[count]['level_2'] 
 				@cpcLine = @cpcLine + "#" + cpcTable[count]['CPC_class']
 			end
+
             temp = @cpcLine
             @cpcLine = temp[1..temp.length-1]
 			count += 1
