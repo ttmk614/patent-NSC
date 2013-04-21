@@ -53,8 +53,8 @@ end
 def assignee_line( html )
     # puts html
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
-    if assignee.to_s.split("(").size > 2    #multiplie assignee
-        File.open("multiple_assignee.txt", "w") { |file| file.write(s) }
+    if assignee.to_s.split("),").size > 2    #multiplie assignee
+        File.open("multiple_assignee.txt", "w") { |file| file.write() }
     end
     assignee_line = ""
     if !assignee.to_a.empty?
