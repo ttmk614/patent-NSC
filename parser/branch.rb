@@ -93,8 +93,6 @@ def appl_id( html )
     return html.xpath('//table/tr[3]/td[2]//text()').to_s.strip.gsub(/,/, "")
 end
 def filing_date( html )
-    puts html.xpath('//table/tr[4]/td//text()')[2].to_s.strip
-    puts "++++++++++++++++++++++++++++++++++"
     # puts html.xpath('//table/tr[4]/td//text()').to_a.size
     # if !html.xpath('//table/tr[4]/td').to_a.size == 4
         # puts html.xpath('//table/tr[4]/td//text()')[1]

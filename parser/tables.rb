@@ -3,24 +3,34 @@
 def patentToInventor(patent_id, inventor_line)
     inventors = Array.new
     count = 0
+    puts inventor_line
 	inventor_line.split('# ').each do |inventor_info|
+        puts inventor_info
         inventors[count] = Hash.new
-        inventor, tmp = inventor_info.split(' (')
-        inventor_location = tmp.gsub(')', "")
-        inventor_location_city, tmp = inventor_location.split(', ')
-        if /^\%/ =~ tmp then
-            inventor_location_country = tmp.gsub('%', '')
-            inventor_location_state = 'NULL'
+        if inventor_info.include? '('
+            inventor, tmp = inventor_info.split(' (')
+            inventor_location = tmp.gsub(')', "")
+            inventor_location_city, tmp = inventor_location.split(', ')
+            if /^\%/ =~ tmp then
+                inventor_location_country = tmp.gsub('%', '')
+                inventor_location_state = 'NULL'
+            else
+                inventor_location_country = tmp
+                inventor_location_state = 'USA'
+            end
+            inventors[count]['inventor_name'] = inventor
+            inventors[count]['inventor_location'] = inventor_location
+            inventors[count]['inventor_location_country'] = inventor_location_country
+            inventors[count]['inventor_location_state'] = inventor_location_state
+            inventors[count]['inventor_location_city'] = inventor_location_city
+            # inventors[count]['inventor_name'] = 
         else
-            inventor_location_country = tmp
-            inventor_location_state = 'USA'
+            inventors[count]['inventor_name'] = inventor_info.strip()
+            inventors[count]['inventor_location'] = 'NULL'
+            inventors[count]['inventor_location_country'] = 'NULL'
+            inventors[count]['inventor_location_state'] = 'NULL'
+            inventors[count]['inventor_location_city'] = 'NULL'
         end
-        inventors[count]['inventor_name'] = inventor
-        inventors[count]['inventor_location'] = inventor_location
-        inventors[count]['inventor_location_country'] = inventor_location_country
-        inventors[count]['inventor_location_state'] = inventor_location_state
-        inventors[count]['inventor_location_city'] = inventor_location_city
-        # inventors[count]['inventor_name'] = 
         count += 1
 		# insert into inventor (`patent_id`, `inventor_name`, `inventor_location`, `inventor_location_country`, `inventor_location_state`, `inventor_location_city`) values (patent_id, inventor, inventor_location, inventor_location_country, inventor_location_state, inventor_location_city)
 	end
