@@ -16,7 +16,6 @@ def get_html( patent_id, year )
     begin # Get HTML of patent_id
         s = "SELECT `Html` FROM `content_#{year}` WHERE `Patent_id`='#{patent_id}'"
         res = @new_patent.query( s )
-        puts res
         if res
         	blocks = res.to_a[0]['Html'].gsub(/'/, "''").gsub(/<th/, "<td").gsub(/th>/, "td>").split("<hr>")
         	r = []

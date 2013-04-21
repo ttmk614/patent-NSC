@@ -96,7 +96,14 @@ def filing_date( html )
     # puts html.xpath('//table/tr[4]/td//text()').to_a.size
     # if !html.xpath('//table/tr[4]/td').to_a.size == 4
         # puts html.xpath('//table/tr[4]/td//text()')[1]
-        return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
+        if !html.xpath('//table/tr[4]/td//text()')[2].to_s.strip.empty?
+            return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
+        else
+            return Date.parse(html.xpath('//table/tr[3]/td//text()')[2].to_s.strip)    
+        end
+
+        # puts html.xpath('//table/tr[4]/td//text()')[2].to_s.strip
+        
     # else
     #     return Date.parse(html.xpath('//table/tr[4]/td//text()')[1].to_s.strip)
     # end
@@ -281,6 +288,7 @@ def getReferences(year, patent_id, html)
 			reference['references_uspto'] = references_uspto
 			#puts references_uspto, '--------------------'
 		elsif /Foreign Patent Documents/ =~ ref.content then
+            # puts "ref.content" +ref.content
 			references_foreign = ''
 			ref.next_element.css('tr td').each do |record|
 				if /^.\d/ =~ record.content then
@@ -288,7 +296,12 @@ def getReferences(year, patent_id, html)
 					date = record.next_element.next_element.content.gsub(/\n/, '')
 					country = record.next_element.next_element.next_element.next_element.content.gsub(/\n/, '')
 					mm, yy = date.split('., ')
-					ref_full = record.to_str + ';' + translator[mm] + '-' + yy + ';' + country
+                    if !mm.empty?   #ex. RE39947's has null attribute in month
+					   ref_full = record.to_str + ';' + translator[mm] + '-' + yy + ';' + country
+                    else
+                        ref_full = record.to_str + ';-' + yy + ';' + country
+                    end
+
 					# puts ref_full # => 964149;03-1975;CA
 					@patent.query( "INSERT INTO `patent`.`reference_#{year}` (`patent_id`, `ref_type`, `ref_full`, `ref_uspto_patent_id`) VALUES (\"#{patent_id}\", '2', \"#{ref_full}\", \"#{record.text}\")")
 				end

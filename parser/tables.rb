@@ -3,9 +3,7 @@
 def patentToInventor(patent_id, inventor_line)
     inventors = Array.new
     count = 0
-    puts inventor_line
 	inventor_line.split('# ').each do |inventor_info|
-        puts inventor_info
         inventors[count] = Hash.new
         if inventor_info.include? '('
             inventor, tmp = inventor_info.split(' (')
