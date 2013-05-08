@@ -49,11 +49,14 @@ def crawl_patent(page)
   tr = table.css('tr')
   (1..tr.to_a.count-1).each do |i|
     td = tr[i].css('td')
-    patent_id = td[1].text.gsub(/,/,"")
-    patent_url = td[1].css('a')
-    file_date = get_file_date(patent_url)
-    @f.write("#{patent_id}\t#{file_date}")
-    puts "#{patent_id}\t#{file_date}"
+    pid = td[1].text.gsub(/,/,"") # 專利id
+    # html 為每個專利文件的 html source code
+    html = Nokogiri::HTML(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
+    # 先改file_date的code即可，之後再改成跑全部的table
+    # 下次約個時間出來一起寫好不好：s
+    file_date = get_file_date(html)
+    @f.write("#{pid}\t#{file_date}\n")
+    puts "#{pid}\t#{file_date}"
   end
 end
 
