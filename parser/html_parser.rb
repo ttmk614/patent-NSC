@@ -3,6 +3,7 @@
 
 require 'nokogiri'
 require 'open-uri'
+require 'date' 
 
 @root_url = "http://patft.uspto.gov"
 @file_name = "file_date_" + ARGV[0]
