@@ -51,9 +51,10 @@ def crawl_patent(page)
     td = tr[i].css('td')
     pid = td[1].text.gsub(/,/,"") # 專利id
     # html 為每個專利文件的 html source code
-    html = Nokogiri::HTML(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
+    html = Nokogiri::parse(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
+    # puts html
     # 先改file_date的code即可，之後再改成跑全部的table
-    # 下次約個時間出來一起寫好不好：s
+    # 下次約個時間出來一起寫好不好：s 好唷好唷>////<
     file_date = get_file_date(html)
     @f.write("#{pid}\t#{file_date}\n")
     puts "#{pid}\t#{file_date}"
@@ -61,18 +62,15 @@ def crawl_patent(page)
 end
 
 def get_file_date(html)
-    begin
-        return Date.parse(html.xpath('//table/tr[4]/td//text()')[2].to_s.strip)
-    rescue  #若html檔資料格式不同則每個都試試看
-        html.xpath('//text()').each do |each|
-            begin
-                return Date.parse(each.to_s.strip)
-            rescue
-                next
-            end
-        end
-        #do something if invalid
+  html.css('table').each do |table|
+    if /Filed:/ =~ table.content then
+      begin
+        return Date.parse(table.xpath('tr[4]//text()')[2].to_s.strip)
+      rescue  #若html檔資料格式不同則每個都試試看
+        return Date.parse(table.xpath('tr[3]//text()')[2].to_s.strip)
+      end
     end
+  end
 end
 
 def get_next_url(page)
