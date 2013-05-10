@@ -8,7 +8,7 @@ require 'date'
 @root_url = "http://patft.uspto.gov"
 @file_name = "file_date_" + ARGV[0]
 @f = File.open(@file_name, "a")
-@err_log = File.open("err_log_" + ARGV[0])
+@err_log = File.open("err_log_" + ARGV[0], "a")
 
 def get_start_page(year)
   begin
