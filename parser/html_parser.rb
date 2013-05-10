@@ -8,6 +8,7 @@ require 'date'
 @root_url = "http://patft.uspto.gov"
 @file_name = "file_date_" + ARGV[0]
 @f = File.open(@file_name, "a")
+@err_log = File.open("err_log_" + ARGV[0])
 
 def get_start_page(year)
   begin
@@ -50,14 +51,19 @@ def crawl_patent(page)
   (1..tr.to_a.count-1).each do |i|
     td = tr[i].css('td')
     pid = td[1].text.gsub(/,/,"") # 專利id
-    # html 為每個專利文件的 html source code
-    html = Nokogiri::parse(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
-    # puts html
-    # 先改file_date的code即可，之後再改成跑全部的table
-    # 下次約個時間出來一起寫好不好：s 好唷好唷>////<
-    file_date = get_file_date(html)
-    @f.write("#{pid}\t#{file_date}\n")
-    puts "#{pid}\t#{file_date}"
+    begin
+      # html 為每個專利文件的 html source code
+      html = Nokogiri::parse(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
+      # puts html
+      # 先改file_date的code即可，之後再改成跑全部的table
+      # 下次約個時間出來一起寫好不好：s 好唷好唷>////<
+      file_date = get_file_date(html)
+      @f.write("#{pid}\t#{file_date}\n")
+      puts "#{pid}\t#{file_date}"
+    rescue => e
+      @err_log.write("#{pid}\t#{e.to_s}\n")
+      next
+    end
   end
 end
 
@@ -112,5 +118,6 @@ while !next_url.nil?
 end
 
 @f.close
+@err_log.close
 puts "Process Duration: #{Time.now - start_time} seconds\n"
 puts "Process end"
