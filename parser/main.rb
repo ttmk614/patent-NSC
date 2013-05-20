@@ -190,6 +190,7 @@ if ARGV.count > 0
 			s = s + ", '#{inventor_info.size}', '#{assignee_num}' )"
 			# puts patent_attrs.size
 			# File.open("query.txt", "w") { |file| file.write(s) }
+			puts s
 			@patent.query( s )
 			puts "patent done!"
 		}
