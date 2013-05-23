@@ -11,9 +11,6 @@ require_relative  'branch'
 require_relative  'tables'
 
 @root_url = "http://patft.uspto.gov"
-@file_name = "file_date_" + ARGV[0]
-@f = File.open(@file_name, "a")
-@err_log = File.open("err_log_" + ARGV[0], "a")
 
 def get_html( html )
     begin # Get HTML of patent_id
@@ -386,7 +383,5 @@ while !next_url.nil?
   end
 end
 
-@f.close
-@err_log.close
 puts "Process Duration: #{Time.now - start_time} seconds\n"
 puts "Process end"
