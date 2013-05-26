@@ -45,30 +45,27 @@ def get_next_page(url)
   return next_page
 end
 
-def crawl_patent(page)
-  table = page.css('table')[1]
-  tr = table.css('tr')
-  (1..tr.to_a.count-1).each do |i|
-    td = tr[i].css('td')
-    pid = td[1].text.gsub(/,/,"") # 專利id
-    # begin
-      # html 為每個專利文件的 html source code
-      html = Nokogiri::parse(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
-
-      reissued_patent_id = get_reissued_patent_id(html)
-      # @f.write("#{pid}\t#{reissued_patent_id}\n")
-      puts "#{pid}\t#{reissued_patent_id}"
-    # rescue => e
-    #   @err_log.write("#{pid}\t#{e.to_s}\n")
-    #   next
-    # end
-  end
+def crawl_patent(pid)
+# begin
+  # html 為每個專利文件的 html source code
+  html = Nokogiri::parse(open("http://patft.uspto.gov/netacgi/nph-Parser?Sect1=PTO1&Sect2=HITOFF&d=PALL&p=1&u=%2Fnetahtml%2FPTO%2Fsrchnum.htm&r=1&f=G&l=50&s1=#{pid}.PN.&OS=PN/#{pid}&RS=PN/#{pid}"))
+  #puts html
+  result = get_reissued_patent_id_and_inventer_line(html)
+  @f.write("#{pid}\t#{result[0]}\t#{result[1]}\n")
+  #puts "#{pid}\t#{result[0]}\t#{result[1]}"
+# rescue => e
+#   @err_log.write("#{pid}\t#{e.to_s}\n")
+#   next
+# end
 end
 
-def get_reissued_patent_id(html)
-  result = nil
+def get_reissued_patent_id_and_inventer_line(html)
+  result = Array.new(2) {nil}
+  #result = nil
   tempTime = 250012
   html.css('table').each do |table|
+    #tmp = table.content
+    #puts tmp
     if /Reissue of:/ =~ table.content then
       table.css('tr').each do |each|
         # puts each
@@ -77,14 +74,33 @@ def get_reissued_patent_id(html)
           if each.css('td[4]').text != "" && ( thisTime < tempTime)
             # puts "++++"+each.css('td[4]').text.strip
               tempTime = thisTime
-              result = each.xpath("td[4]").text.upcase.gsub(/[^A-Z0-9]/, "")
-              result = result.gsub(/^0/,"")
+              result[0] = each.xpath("td[4]").text.upcase.gsub(/[^A-Z0-9]/, "")
+              result[0] = result[0].gsub(/^0/,"")
           end
+        end
+      end
+    else
+      table.css('tr').each do |tuple|
+        if /Inventors:/ =~ tuple.content then
+          inventors_line = ''
+          tuple.css('td b').each do |info|
+          #puts info.content + info.next.content
+          if /^[A-Z][A-Z]$/ =~ info then
+            inventors_line += '%'
+          end
+          #puts inventors_line
+          inventors_line = inventors_line + info.content.gsub(',', '#') + info.next.content
+          end
+          #puts inventors_line
+          result[1] = inventors_line.to_s.gsub(/'/, "''") 
         end
       end
     end
   end
-  return result == nil ? "nil" : result
+  if result[0] == nil 
+    result[0] = "nil"
+  end
+  return result
 end
 
 
@@ -119,28 +135,52 @@ def get_next_url(page)
   return next_page_url
 end
 
-puts "process start\n"
-start_time = Time.now
-
-if ARGV.count == 1
-  @year = ARGV[0]
-  page = get_start_page(@year)
-  next_url = get_next_url(page)
-elsif ARGV.count == 2
-  @year = ARGV[0]
-  num = ARGV[1]
-  page = get_jump_page(@year, num)
-  next_url = get_next_url(page)
+def issued_year( )
+  #2008
+  text = File.read( "../issueyear.txt" )
+  lines = text.split("\n")
+  table = Hash.new
+  lines.each do |line|
+    line = line.split(/\s+/)
+    table[line[0]] = line[1..line.size-1]
+  end
+  return table
 end
 
-while !next_url.nil?
-  crawl_patent(page)
-  next_url = get_next_url(page)
-  puts ">>>> next_url >>>>"
-  if !next_url.nil?
-    page = get_next_page(next_url)
-  else
-    puts "END PAGE"
+puts "process start\n"
+start_time = Time.now
+issued_year_table = issued_year()
+@year = ARGV[0]
+
+if ARGV.count == 1
+  begin_patent = issued_year_table[@year].first
+elsif ARGV.count == 2
+  begin_patent = ARGV[1]
+end
+begin_header = begin_patent.scan(/\D+/).first
+
+go_on = false
+
+this_yr_category_num = issued_year_table[@year].length
+this_yr = issued_year_table[@year]
+next_yr = issued_year_table[(@year.to_i+1).to_s]
+(0..this_yr_category_num-1).each do |n|
+  str_header = this_yr[n].scan(/\D+/).first
+  #p str_header
+  if begin_header == str_header or go_on == true
+    if go_on == false
+      begin_number = begin_patent.gsub("#{begin_header}", "").to_i
+      go_on = true
+    else
+      begin_number = this_yr[n].gsub("#{str_header}", "").to_i
+    end
+
+    (begin_number..(next_yr[n].gsub("#{str_header}", "").to_i)).each do |patent_num|
+      #puts patent_num
+      patent_id = "#{str_header}#{patent_num}"
+      puts patent_id
+      crawl_patent(patent_id)
+    end
   end
 end
 
