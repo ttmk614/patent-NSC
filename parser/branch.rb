@@ -336,7 +336,7 @@ def getInventor(html)
 					if /^[A-Z][A-Z]$/ =~ info then
 						inventors_line += '%'
 					end
-					inventors_line = inventors_line + info.content.gsub(',', '#') + info.next.content
+					inventors_line = inventors_line + info.content.gsub(', deceased', '').gsub(',', '#') + info.next.content
 				end
 				#puts inventors_line
 				return inventors_line.to_s.gsub(/'/, "''") 
