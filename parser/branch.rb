@@ -51,46 +51,63 @@ def abstract( html )
     return html.xpath('//p/text()')[0].to_s().strip.to_s.gsub(/'/, "''")
 end
 def assignee_line( html )
-    # puts html
     assignee = html.xpath('//table/tr[2]/td[2]//text()')
-    if assignee.to_s.split("),").size > 2    #multiplie assignee
-        # File.open("multiple_assignee.txt", "w") { |file| file.write() }
-    end
     assignee_line = ""
     if !assignee.to_a.empty?
         info = html.xpath('//table/tr[2]/td[2]/b[2]')
-        assignee = html.xpath('//table/tr[2]/td[2]//text()')
+        # assignee = html.xpath('//table/tr[2]/td[2]//text()')
         assignee[1..assignee.size-1].each do |span|
-        	span = span.to_s.strip.gsub(/\n/,"")
-        	if /^[A-Z][A-Z]$/ =~ span then
-        		if info.empty? then # usa, no %
-    		    	assignee_line = assignee_line + span
-    		    else #country name
-    		    	assignee_line = assignee_line + '%' + span
-    		    end
-        	else
-    		    assignee_line += span + " "
-    		end
+            span = span.to_s.strip.gsub(/\n|\r/,"").gsub(")",")#")
+            if /^[A-Z][A-Z]$/ =~ span then
+                if info.empty? then # usa, no %
+                    assignee_line = assignee_line + span
+                else #country name
+                    assignee_line = assignee_line + '%' + span
+                end
+            else
+                assignee_line += span + " "
+            end
         end
-    # else
-    #     info = html.xpath('//table/tr[2]/td[1]/b[2]')
-    #     assignee = html.xpath('//table/tr[2]/td[1]//text()')
-    #     puts assignee
-    #     assignee[1..assignee.size-1].each do |span|
-    #         span = span.to_s.strip.gsub(/\n/,"")
-    #         if /^[A-Z][A-Z]$/ =~ span then
-    #             if info.empty? then # usa, no %
-    #                 assignee_line = assignee_line + span
-    #             else #country name
-    #                 assignee_line = assignee_line + '%' + span
-    #             end
-    #         else
-    #             assignee_line += span + " "
-    #         end
-    #     end
     end
-    # print assignee_line
-    return assignee_line
+    p assignee_line[0..(assignee_line.length-3)]
+    return assignee_line[0..(assignee_line.length-3)]
+
+
+    # #  >> Mike code here start
+    # info = html.xpath('//table/tr[2]/td[2]')
+    # a = info.first.to_s.split(/[\n\r]/)
+    # b = a.select{|n| n!="" }
+    # final_result = ""
+    # b[1..b.size-2].each do |span|
+    #   unless span.include? "("
+    #     span = span.to_s.strip.gsub("<br>","")
+    #     span = span.to_s.strip.gsub("<b>","")
+    #     span = span.to_s.strip.gsub("</b>","")
+    #     unless span.include? ")"
+    #       final_result = final_result + span
+    #     else
+    #       final_result = final_result + span + "#"
+    #     end
+    #   else
+    #     unless span.include? "<b>"
+    #       span = span.to_s.strip.gsub("<br>","")
+    #       span = span.to_s.strip.gsub("<b>","")
+    #       span = span.to_s.strip.gsub("</b>","")
+    #       final_result = final_result +span
+    #     else
+    #       span = span.to_s.strip.gsub("<br>","")
+    #       span = span.to_s.strip.gsub("<b>","")
+    #       span = span.to_s.strip.gsub("</b>","")
+    #       final_result = final_result + "%" +span
+    #     end
+    #   end
+    # end
+    # final_result.chop!
+    # p final_result
+    # assignee_line = final_result
+    # #  >> Mike code here end
+    
+    # return assignee_line
 end
 def appl_id( html )
     return html.xpath('//table/tr[3]/td[2]//text()').to_s.strip.gsub(/,/, "")
@@ -336,7 +353,7 @@ def getInventor(html)
 					if /^[A-Z][A-Z]$/ =~ info then
 						inventors_line += '%'
 					end
-					inventors_line = inventors_line + info.content.gsub(', deceased', '').gsub(',', '#') + info.next.content
+					inventors_line = inventors_line + info.content.gsub(',', '#') + info.next.content
 				end
 				#puts inventors_line
 				return inventors_line.to_s.gsub(/'/, "''") 

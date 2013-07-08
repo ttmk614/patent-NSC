@@ -104,7 +104,7 @@ if ARGV.count > 0
 		########################### A assignee_line  
 		assigneeTemp = assignee_line( html[i] )
 		patent_attrs << assigneeTemp
-		assignee_num = assigneeTemp == "" ? "0" : "1"
+		assignee_num = assigneeTemp.split("#").size
 		########################### A	appl_id
 		patent_attrs << appl_id( html[i] )
 		########################### A	filing_date
